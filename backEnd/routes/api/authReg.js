@@ -2,35 +2,53 @@ const express = require("express")
 const route = express.Router()
 const mongoose = require("mongoose")
 const TodoUser = require("../../model/createModel")
+const secureApi = require("../../middleware/scureApi")
+const cors = require('cors')
 
 route.use(express.json())
+route.use(cors())
+
 
 mongoose.connect('mongodb+srv://todo:csuzUcLfs8NlFkJY@cluster0.xikiztl.mongodb.net/users?retryWrites=true&w=majority')
   .then(() => console.log('db connent!'));
 
-route.post("/reg",(req,res)=>{
-    const {name, email, password} = req.body
+route.post("/todo",(req,res)=>{
+   console.log(req.body)
+    const {post} = req.body
 
-   if(!name){
-    res.send({nameError: "enter Your Name"})
-   }
-
-   if(!email){
-    res.send({emailError: "enter Your email"})
-   }
-
-   if(!password){
-    res.send({passwordError: "enter Your password"})
+   if(!post){
+    res.send({nameError: "post someThing"})
    }
 
    let data = new TodoUser({
-      name:name,
-      email:email,
-      password:password
+      post:post,
+      
    })
 
    data.save()
    res.send(data)
+})
+
+
+route.get("/todo",async (req,res)=>{
+  let datas = await TodoUser.find()
+  res.send(datas)
+  
+})
+
+route.delete("/todo", async (req,res)=>{
+   const {_id, post} = req.body
+ let deletes = await TodoUser.findByIdAndDelete(_id, {post})
+ res.send(deletes)
+ console.log("delete Done")
+})
+
+route.put("/todo", async (req,res)=>{
+   const {_id, post} = req.body
+
+   let updatesTo = await TodoUser.findByIdAndUpdate(_id, {post})
+   res.send(updatesTo)
+   console.log("update Done")
 })
 
 

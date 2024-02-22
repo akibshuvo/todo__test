@@ -1,33 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import axios from "axios"
+import { useEffect, useState } from "react"
+
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  let [value, setValue] = useState("")
+  let [postData, setPostData] = useState([])
+  console.log(postData,"lll")
+  
+  let handleClick = ()=>{
+    axios.post("http://localhost:8000/api/v1/start/todo",{
+      post:value
+    }).then(()=>{
+      location.reload()
+
+    })
+
+    console.log(value)
+  }
+
+  useEffect(()=>{
+    axios.get("http://localhost:8000/api/v1/start/todo").then((user)=>{
+      setPostData(user.data)
+      console.log(user)
+    })
+  },[])
+
+  let handleDe = (ids)=>{
+    axios.delete("http://localhost:8000/api/v1/start/todo/" + ids).then(()=>{
+      location.reload()
+   
+    })
+  }
+  
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+     <div className="box">
+      <div className="content">
+      <h1>ToDo's Projects...</h1>
+
+      <div className="btn">
+      <input onChange={(e)=>setValue(e.target.value)} className="inputs" type="text" placeholder="Enter Your Post"/>
+     <button onClick={handleClick}>Post</button>
+     </div>
+     </div>
+
+{postData.map(item=>(
+  <ul className="list">
+      <li>{item.post} <button onClick={()=>handleDe(item._id)}>Delete</button> <button>Edit</button></li>
+     </ul>
+))}
+     
+     </div>
     </>
   )
 }
